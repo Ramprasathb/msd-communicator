@@ -4,6 +4,7 @@ import { ApolloProvider } from 'react-apollo';
 import { ApolloClient } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { createHttpLink } from 'apollo-link-http';
+import 'semantic-ui-css/semantic.min.css';
 
 import registerServiceWorker from './registerServiceWorker';
 import Routes from './routes';
