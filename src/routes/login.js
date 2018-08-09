@@ -1,6 +1,12 @@
 import React from 'react';
 import {
-  Message, Segment, Container, Header, Input, Button, Form,
+  Message,
+  Segment,
+  Container,
+  Header,
+  Input,
+  Button,
+  Form,
 } from 'semantic-ui-react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -10,20 +16,20 @@ class Login extends React.Component {
   state = {
     email: '',
     password: '',
-    loginError: '',
-    loading: true,
-  };
-
-  componentDidMount = () => {
-    this.setState({ loading: true });
+    emailError: '',
+    passwordError: '',
+    loading: false,
+    errorMessages: [],
   };
 
   loginUser = async () => {
     const { email, password } = this.state;
     if (!!email && !!password) {
+      this.setState({ loading: true });
       const response = await this.props.mutate({
         variables: { email, password },
       });
+      this.setState({ loading: false });
       const {
         success, errors, token, refreshToken,
       } = response.data.loginUser;
@@ -32,9 +38,14 @@ class Login extends React.Component {
         localStorage.setItem('refreshToken', refreshToken);
         this.props.history.push('/');
       } else {
-        _.forEach(errors, (error) => {
-          this.setState({ loginError: error.message });
+        const errorMessages = [];
+        const fieldError = {};
+        errors.forEach(({ field, message }) => {
+          fieldError[`${field}Error`] = message;
+          errorMessages.push(message);
         });
+        this.setState({ errorMessages });
+        this.setState(fieldError);
       }
     }
   };
@@ -46,20 +57,19 @@ class Login extends React.Component {
 
   render() {
     const {
-      email, password, loginError, loading,
+      email,
+      password,
+      loading,
+      errorMessages,
+      passwordError,
+      emailError,
     } = this.state;
-    const errorMessages = [];
-
-    if (loginError.length > 0) {
-      errorMessages.push(loginError);
-    }
-
     return (
       <Container text>
-        <Header as="h2">Let's get to work, Login!</Header>
-        <Segment raised attached>
+        <Header as="h2">Let's get to work, Login! </Header>
+        <Segment raised attached loading={loading}>
           <Form>
-            <Form.Field>
+            <Form.Field error={!!emailError}>
               <label>Email Address</label>
               <Input
                 icon="mail"
@@ -72,7 +82,7 @@ class Login extends React.Component {
                 fluid
               />
             </Form.Field>
-            <Form.Field>
+            <Form.Field error={!!passwordError}>
               <label>Password</label>
               <Input
                 icon="key"
@@ -91,7 +101,11 @@ class Login extends React.Component {
             </Button>
           </Form>
         </Segment>
-        {loginError.length > 0 ? <Message error header="Error while logging in" list={errorMessages} /> : ''}
+        {errorMessages.length > 0 ? (
+          <Message error header="Error while logging in" list={errorMessages} />
+        ) : (
+          ''
+        )}
       </Container>
     );
   }

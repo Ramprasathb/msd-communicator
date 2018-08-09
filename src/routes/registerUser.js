@@ -23,6 +23,7 @@ class RegisterUser extends React.Component {
     emailError: '',
     passwordError: '',
     conditionError: '',
+    loading: false,
   };
 
   registerUser = async () => {
@@ -42,10 +43,11 @@ class RegisterUser extends React.Component {
       this.setState({ conditionError: error });
       return;
     }
-
+    this.setState({ loading: true });
     const response = await this.props.mutate({
       variables: { username, email, password },
     });
+    this.setState({ loading: false });
     const { success, errors } = response.data.registerUser;
 
     //  Redirect user to homepage when registration succeeds
@@ -59,7 +61,6 @@ class RegisterUser extends React.Component {
 
       this.setState(fieldError);
     }
-    console.log('User created : ', response);
   };
 
   navigateToLoginScreen = () => {
@@ -85,6 +86,7 @@ class RegisterUser extends React.Component {
       emailError,
       passwordError,
       conditionError,
+      loading,
     } = this.state;
     const errorMessages = [];
 
@@ -107,15 +109,14 @@ class RegisterUser extends React.Component {
           <Icon name="users" circular />
           <Header.Content>Register</Header.Content>
         </Header>
-        <Segment raised>
+        <Segment raised loading={loading}>
           <Form>
-            <Form.Field>
+            <Form.Field error={!!usernameError}>
               <label>Username</label>
               <Input
                 icon="user"
                 iconPosition="left"
                 name="username"
-                error={!!usernameError}
                 onChange={this.updateInputValues}
                 value={username}
                 placeholder="Username"
@@ -123,13 +124,12 @@ class RegisterUser extends React.Component {
                 fluid
               />
             </Form.Field>
-            <Form.Field>
+            <Form.Field error={!!emailError}>
               <label required>Email Address</label>
               <Input
                 icon="mail"
                 iconPosition="left"
                 name="email"
-                error={!!emailError}
                 onChange={this.updateInputValues}
                 value={email}
                 placeholder="Email Address"
@@ -137,13 +137,12 @@ class RegisterUser extends React.Component {
                 fluid
               />
             </Form.Field>
-            <Form.Field>
+            <Form.Field error={!!passwordError}>
               <label>Password</label>
               <Input
                 icon="key"
                 iconPosition="left"
                 name="password"
-                error={!!passwordError}
                 onChange={this.updateInputValues}
                 value={password}
                 placeholder="Password"
@@ -175,10 +174,7 @@ class RegisterUser extends React.Component {
             </Button>
           </Form>
         </Segment>
-        {usernameError.length
-          + emailError.length
-          + passwordError.length
-          + conditionError.length
+        {errorMessages.length
         > 0 ? (
           <Message
             error
