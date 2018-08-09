@@ -1,5 +1,15 @@
 import React from 'react';
-import { Message, Segment, Container, Header, Input, Button, Form, Checkbox } from 'semantic-ui-react';
+import {
+  Message,
+  Segment,
+  Container,
+  Header,
+  Input,
+  Button,
+  Form,
+  Checkbox,
+  Icon,
+} from 'semantic-ui-react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -23,10 +33,12 @@ class RegisterUser extends React.Component {
       conditionError: '',
     });
 
-    const { username, email, password, condition, conditionError } = this.state;
+    const {
+      username, email, password, condition, conditionError,
+    } = this.state;
 
     if (!condition) {
-      let error = 'Please accept the terms & conditions';
+      const error = 'Please accept the terms & conditions';
       this.setState({ conditionError: error });
       return;
     }
@@ -36,11 +48,11 @@ class RegisterUser extends React.Component {
     });
     const { success, errors } = response.data.registerUser;
 
-    //Redirect user to homepage when registration succeeds
+    //  Redirect user to homepage when registration succeeds
     if (success) {
-      this.props.history.push('/');
+      this.props.history.push('/login');
     } else {
-      let fieldError = {};
+      const fieldError = {};
       errors.forEach(({ field, message }) => {
         fieldError[`${field}Error`] = message;
       });
@@ -50,12 +62,16 @@ class RegisterUser extends React.Component {
     console.log('User created : ', response);
   };
 
-  updateInputValues = e => {
+  navigateToLoginScreen = () => {
+    this.props.history.push('/login');
+  };
+
+  updateInputValues = (e) => {
     const { name, value } = e.target;
     this.setState({ [name]: value });
   };
 
-  updateTermsAndConditions = checked => {
+  updateTermsAndConditions = (checked) => {
     this.setState({ condition: checked });
   };
 
@@ -87,11 +103,14 @@ class RegisterUser extends React.Component {
 
     return (
       <Container text>
-        <Header as="h2">Register User</Header>
-        <Segment>
+        <Header as="h2" icon textAlign="center">
+          <Icon name="users" circular />
+          <Header.Content>Register</Header.Content>
+        </Header>
+        <Segment raised>
           <Form>
             <Form.Field>
-              <label>UserName</label>
+              <label>Username</label>
               <Input
                 icon="user"
                 iconPosition="left"
@@ -137,19 +156,38 @@ class RegisterUser extends React.Component {
               <Checkbox
                 label="I agree to the Terms and Conditions"
                 name="condition"
-                onChange={(e, data) => this.updateTermsAndConditions(data.checked)}
+                onChange={(e, data) => this.updateTermsAndConditions(data.checked)
+                }
               />
             </Form.Field>
             <Button type="submit" onClick={this.registerUser}>
               Register
             </Button>
+            <Button
+              type="navigate"
+              onClick={this.navigateToLoginScreen}
+              floated="right"
+              icon
+              labelPosition="right"
+            >
+              Sign In
+              <Icon name="right arrow" />
+            </Button>
           </Form>
         </Segment>
-        {usernameError.length + emailError.length + passwordError.length + conditionError.length > 0 ? (
-          <Message error header="Error while registering" list={errorMessages} />
-        ) : (
-          ''
-        )}
+        {usernameError.length
+          + emailError.length
+          + passwordError.length
+          + conditionError.length
+        > 0 ? (
+          <Message
+            error
+            header="Error while registering"
+            list={errorMessages}
+          />
+          ) : (
+            ''
+          )}
       </Container>
     );
   }
