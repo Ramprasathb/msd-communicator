@@ -106,7 +106,7 @@ class RegisterUser extends React.Component {
     return (
       <Container text>
         <Header as="h2" icon textAlign="center">
-          <Icon name="users" circular />
+          <Icon name="user" circular />
           <Header.Content>Register</Header.Content>
         </Header>
         <Segment raised loading={loading}>

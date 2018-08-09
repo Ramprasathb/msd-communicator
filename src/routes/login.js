@@ -10,7 +10,6 @@ import {
 } from 'semantic-ui-react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import _ from 'lodash';
 
 class Login extends React.Component {
   state = {
