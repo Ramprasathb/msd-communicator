@@ -7,6 +7,7 @@ import {
   Input,
   Button,
   Form,
+  Icon,
 } from 'semantic-ui-react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -49,6 +50,10 @@ class Login extends React.Component {
     }
   };
 
+  navigateToRegisterUserScreen = () => {
+    this.props.history.push('/register');
+  };
+
   updateInputValues = (e) => {
     const { name, value } = e.target;
     this.setState({ [name]: value });
@@ -65,7 +70,10 @@ class Login extends React.Component {
     } = this.state;
     return (
       <Container text>
-        <Header as="h2">Let's get to work, Login! </Header>
+        <Header as="h2" icon textAlign="center">
+          <Icon name="user" circular />
+          <Header.Content>Let's get to work, Login!</Header.Content>
+        </Header>
         <Segment raised attached loading={loading}>
           <Form>
             <Form.Field error={!!emailError}>
@@ -95,8 +103,25 @@ class Login extends React.Component {
                 fluid
               />
             </Form.Field>
-            <Button type="submit" onClick={this.loginUser}>
+            <Button
+              type="submit"
+              onClick={this.loginUser}
+              basic
+              color="green"
+            >
               Login
+            </Button>
+            <Button
+              type="navigate"
+              onClick={this.navigateToRegisterUserScreen}
+              floated="right"
+              icon
+              basic
+              color="red"
+              labelPosition="right"
+            >
+              Sign Up
+              <Icon name="right arrow" />
             </Button>
           </Form>
         </Segment>

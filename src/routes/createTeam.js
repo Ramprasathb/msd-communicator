@@ -7,6 +7,7 @@ import {
   Input,
   Button,
   Form,
+  Icon,
 } from 'semantic-ui-react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
@@ -22,10 +23,22 @@ class CreateTeam extends React.Component {
     const { name } = this.state;
     if (name.length > 0) {
       this.setState({ loading: true });
-      const response = await this.props.mutate({
-        variables: { name },
-      });
-      this.setState({ loading: false });
+      let response = null;
+      try {
+        response = await this.props.mutate({
+          variables: { name },
+        });
+        this.setState({ loading: false });
+      } catch (err) {
+        const errorMessages = [];
+        errorMessages.push('User is not logged in !');
+        this.setState({ loading: false, errorMessages });
+        setTimeout(() => {
+          this.props.history.push('/login');
+        }, 2000);
+        return;
+      }
+
       const { success, errors } = response.data.createTeam;
       if (success) {
         this.props.history.push('/');
@@ -48,7 +61,10 @@ class CreateTeam extends React.Component {
     const { name, loading, errorMessages } = this.state;
     return (
       <Container text>
-        <Header as="h2">Let's form a team! </Header>
+        <Header as="h2" icon textAlign="center">
+          <Icon name="users" circular />
+          <Header.Content>Let's form your team</Header.Content>
+        </Header>
         <Segment raised attached loading={loading}>
           <Form>
             <Form.Field>
@@ -64,7 +80,7 @@ class CreateTeam extends React.Component {
                 fluid
               />
             </Form.Field>
-            <Button type="submit" content="primary" onClick={this.createTeam}>
+            <Button type="submit" onClick={this.createTeam} basic color="green">
               Create
             </Button>
           </Form>

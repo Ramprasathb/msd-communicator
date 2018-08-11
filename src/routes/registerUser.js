@@ -106,7 +106,7 @@ class RegisterUser extends React.Component {
     return (
       <Container text>
         <Header as="h2" icon textAlign="center">
-          <Icon name="user" circular />
+          <Icon name="add user" circular />
           <Header.Content>Register</Header.Content>
         </Header>
         <Segment raised loading={loading}>
@@ -159,7 +159,12 @@ class RegisterUser extends React.Component {
                 }
               />
             </Form.Field>
-            <Button type="submit" onClick={this.registerUser}>
+            <Button
+              type="submit"
+              onClick={this.registerUser}
+              basic
+              color="green"
+            >
               Register
             </Button>
             <Button
@@ -167,6 +172,8 @@ class RegisterUser extends React.Component {
               onClick={this.navigateToLoginScreen}
               floated="right"
               icon
+              basic
+              color="red"
               labelPosition="right"
             >
               Sign In
