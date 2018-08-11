@@ -19,6 +19,10 @@ class CreateTeam extends React.Component {
     errorMessages: [],
   };
 
+  cancelTeamCreation = () => {
+    this.props.history.goBack();
+  };
+
   createTeam = async () => {
     const { name } = this.state;
     if (name.length > 0) {
@@ -39,9 +43,9 @@ class CreateTeam extends React.Component {
         return;
       }
 
-      const { success, errors } = response.data.createTeam;
+      const { success, errors, team } = response.data.createTeam;
       if (success) {
-        this.props.history.push('/');
+        this.props.history.push(`/${team.id}`);
       } else {
         const errorMessages = [];
         errors.forEach(({ field, message }) => {
@@ -83,6 +87,9 @@ class CreateTeam extends React.Component {
             <Button type="submit" onClick={this.createTeam} basic color="green">
               Create
             </Button>
+            <Button onClick={this.cancelTeamCreation} floated="right">
+              Cancel
+            </Button>
           </Form>
         </Segment>
         {errorMessages.length > 0 ? (
@@ -103,6 +110,9 @@ const createTeamMutationQuery = gql`
   mutation($name: String!) {
     createTeam(name: $name) {
       success
+      team {
+        id
+      }
       errors {
         field
         message
