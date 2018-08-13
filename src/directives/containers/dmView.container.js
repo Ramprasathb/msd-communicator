@@ -2,6 +2,7 @@ import React from 'react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import { Comment } from 'semantic-ui-react';
+import Moment from 'react-moment';
 
 import { Messages } from '../msd.directives';
 
@@ -70,7 +71,7 @@ class DirectMessageContainer extends React.Component {
               <Comment.Content>
                 <Comment.Author as="a">{m.sender.username}</Comment.Author>
                 <Comment.Metadata>
-                  <div>{m.created_at}</div>
+                  <Moment fromNow>{m.created_at}</Moment>
                 </Comment.Metadata>
                 <Comment.Text>{m.message}</Comment.Text>
                 <Comment.Actions>
