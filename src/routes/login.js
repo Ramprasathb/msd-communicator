@@ -13,6 +13,12 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
 class Login extends React.Component {
+  constructor() {
+    super();
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+  }
+
   state = {
     email: '',
     password: '',

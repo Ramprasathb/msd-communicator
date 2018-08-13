@@ -102,7 +102,8 @@ const getMessagesQuery = gql`
 `;
 
 export default graphql(getMessagesQuery, {
-  variables: props => ({
-    channelId: props.channelId,
+  options: props => ({
+    variables: { channelId: props.channelId },
+    fetchPolicy: 'network-only',
   }),
 })(MessageViewContainer);

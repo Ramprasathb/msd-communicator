@@ -14,7 +14,7 @@ import { getAllTeamsQuery } from '../query/team.query';
 
 const DirectMessages = ({
   mutate, data: {
-    loading, ownedTeams, memberOfTeams, error,
+    loading, ownedTeams, memberOfTeams, error, getUser,
   },
   match: {
     params: { teamId, userId },
@@ -68,12 +68,48 @@ const DirectMessages = ({
                   receiverId: userId,
                   teamId,
                 },
+                update: (store) => {
+                  const data = store.readQuery({ query: getAllTeamsQuery });
+                  let updatedTeamIndex = -1;
+                  if (data.ownedTeams) {
+                    updatedTeamIndex = findIndex(data.ownedTeams, [
+                      'id',
+                      parseInt(teamId, 10),
+                    ]);
+                    if (updatedTeamIndex > -1) {
+                      const dmUserNotPresent = data.ownedTeams[updatedTeamIndex].directMessageMembers.every(member => member.id !== parseInt(userId, 10));
+                      if (dmUserNotPresent) {
+                        data.ownedTeams[updatedTeamIndex].directMessageMembers.push({
+                          __typename: 'User',
+                          id: userId,
+                          username: getUser.username,
+                        });
+                        store.writeQuery({ query: getAllTeamsQuery, data });
+                      }
+                    }
+                  } else {
+                    updatedTeamIndex = findIndex(data.memberOfTeams, [
+                      'id',
+                      parseInt(teamId, 10),
+                    ]);
+                    if (updatedTeamIndex > -1) {
+                      const dmUserNotPresent = data.memberOfTeams[updatedTeamIndex].directMessageMembers.every(member => member.id !== parseInt(userId, 10));
+                      if (dmUserNotPresent) {
+                        data.memberOfTeams[updatedTeamIndex].directMessageMembers.push({
+                          __typename: 'User',
+                          id: userId,
+                          username: getUser.username,
+                        });
+                        store.writeQuery({ query: getAllTeamsQuery, data });
+                      }
+                    }
+                  }
+                },
               },
             );
-            console.log(response);
           }
         }
-        placeholder={userId}
+        placeholder={getUser.username}
       />
     </MsdGridLayout>
   );
@@ -85,7 +121,44 @@ const createDirectMessageMutation = gql`
   }
 `;
 
+const directMessageQuery = gql`
+query($userId: Int!){
+  getUser(userId: $userId) {
+    username
+  }
+  ownedTeams {
+    id
+    name
+    channels {
+      id
+      name
+    }
+    directMessageMembers {
+      id
+      username
+    }
+  }
+  memberOfTeams {
+    id
+    name
+    channels {
+      id
+      name
+    }
+    directMessageMembers {
+      id
+      username
+    }
+  }
+}
+`;
+
 export default compose(
-  graphql(getAllTeamsQuery, { options: { fetchPolicy: 'network-only' } }),
+  graphql(directMessageQuery, {
+    options: props => ({
+      variables: { userId: props.match.params.userId },
+      fetchPolicy: 'network-only',
+    }),
+  }),
   graphql(createDirectMessageMutation),
 )(DirectMessages);

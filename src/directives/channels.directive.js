@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Icon } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Icon, Divider } from 'semantic-ui-react';
+import { Link, Redirect } from 'react-router-dom';
 import { PullLeft } from './msd.directives';
 
 const ChannelComponent = styled.div`
@@ -63,6 +63,7 @@ const constructDirectMessagesView = ({ id, username }, teamId) => (
   </Link>
 );
 
+
 const Channels = ({
   teamId,
   teamName,
@@ -77,8 +78,7 @@ const Channels = ({
   <ChannelComponent>
     <PullLeft>
       <ChannelSectionHeader>{teamName}</ChannelSectionHeader>
-      &nbsp;(
-      {userName})
+        &nbsp;({userName})
       {isOwnedTeam ? (
         <div>
           <a href="#inviteUsers" onClick={onInviteUsersClick}>
@@ -86,6 +86,7 @@ const Channels = ({
           </a>
         </div>
       ) : null}
+      <Divider horizontal />
     </PullLeft>
     <div>
       <ChannelSectionList>

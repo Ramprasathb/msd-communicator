@@ -93,4 +93,8 @@ const getTeamMembersQuery = gql`
   }
 `;
 
-export default withRouter(graphql(getTeamMembersQuery)(DirectMessageModal));
+export default withRouter(
+  graphql(getTeamMembersQuery, { options: { fetchPolicy: 'network-only' } })(
+    DirectMessageModal,
+  ),
+);
