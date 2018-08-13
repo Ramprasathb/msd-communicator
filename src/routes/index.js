@@ -10,6 +10,7 @@ import RegisterUser from './registerUser';
 import Login from './login';
 import CreateTeam from './createTeam';
 import AllTeams from './communicatorHome';
+import DirectMessage from './directMessages';
 
 const isUserAuthenticated = () => {
   const token = localStorage.getItem('token');
@@ -48,6 +49,7 @@ export default () => (
       <Route path="/register" exact component={RegisterUser} />
       <Route path="/login" exact component={Login} />
       <AuthenticatedRoute path="/createTeam" exact component={CreateTeam} />
+      <AuthenticatedRoute path="/user/:teamId/:userId" exact component={DirectMessage} />
       <AuthenticatedRoute path="/:teamId?/:channelId?" exact component={AllTeams} />
     </Switch>
   </BrowserRouter>

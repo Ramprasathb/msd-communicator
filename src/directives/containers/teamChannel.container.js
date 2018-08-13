@@ -5,6 +5,7 @@ import Teams from '../teams.directive';
 import Channels from '../channels.directive';
 import CreateChannelModal from '../../modal/createChannel';
 import AddUsersToTeamModal from '../../modal/addUsersToTeam';
+import DMUsersModal from '../../modal/directMessageUsers';
 
 class TeamChannelContainer extends React.Component {
   constructor() {
@@ -12,6 +13,7 @@ class TeamChannelContainer extends React.Component {
     this.state = {
       isAddChannelOpen: false,
       isInviteUsersModalOpen: false,
+      isDMUsersModalOpen: false,
     };
   }
 
@@ -28,6 +30,15 @@ class TeamChannelContainer extends React.Component {
     }
     this.setState(state => ({
       isInviteUsersModalOpen: !state.isInviteUsersModalOpen,
+    }));
+  };
+
+  toggleDMUsersModal = (e) => {
+    if (e) {
+      e.preventDefault();
+    }
+    this.setState(state => ({
+      isDMUsersModalOpen: !state.isDMUsersModalOpen,
     }));
   };
 
@@ -58,9 +69,10 @@ class TeamChannelContainer extends React.Component {
         isOwnedTeam={currentTeam.isOwned}
         userName={username}
         channels={currentTeam.channels}
-        users={[{ id: 1, name: 'bot' }, { id: 2, name: 'User1' }]}
+        users={currentTeam.directMessageMembers}
         createChannelCallback={this.toggleCreateChannelModal}
         onInviteUsersClick={this.toggleInviteUsersModal}
+        onDMUsersCallback={this.toggleDMUsersModal}
       />,
       <CreateChannelModal
         onClose={this.toggleCreateChannelModal}
@@ -73,6 +85,12 @@ class TeamChannelContainer extends React.Component {
         open={this.state.isInviteUsersModalOpen}
         key="addUsersToTeam"
         teamId={currentTeam.id}
+      />,
+      <DMUsersModal
+        teamId={currentTeam.id}
+        onClose={this.toggleDMUsersModal}
+        open={this.state.isDMUsersModalOpen}
+        key="invite-people-modal"
       />,
     ];
   }

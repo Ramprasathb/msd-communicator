@@ -1,8 +1,9 @@
 import React from 'react';
-import { graphql } from 'react-apollo';
+import { graphql, compose } from 'react-apollo';
 import { Redirect } from 'react-router-dom';
 import findIndex from 'lodash/findIndex';
 import cloneDeep from 'lodash/cloneDeep';
+import gql from 'graphql-tag';
 
 import {
   MsdGridLayout,
@@ -14,7 +15,7 @@ import MessageViewContainer from '../directives/containers/messageView.container
 import { getAllTeamsQuery } from '../query/team.query';
 
 const CommunicatorHome = ({
-  data: {
+  mutate, data: {
     loading, ownedTeams, memberOfTeams, error,
   },
   match: {
@@ -74,9 +75,24 @@ const CommunicatorHome = ({
       {currentChannelObj ? (
         <MessageViewContainer channelId={currentChannelObj.id} />) : null}
       {currentChannelObj ? (
-        <MessageInput channelName={currentChannelObj.name} channelId={currentChannelObj.id} />
+        <MessageInput
+          placeholder={currentChannelObj.name}
+          onSubmit={async (message) => {
+            await mutate({ variables: { message, channelId: currentChannelObj.id } });
+          }}
+        />
       ) : null}
     </MsdGridLayout>
   );
 };
-export default graphql(getAllTeamsQuery)(CommunicatorHome);
+
+const createMessageMutation = gql`
+  mutation($channelId: Int!, $message: String!) {
+    createChannelMessage(channelId: $channelId, message: $message)
+  }
+`;
+
+export default compose(
+  graphql(getAllTeamsQuery, { options: { fetchPolicy: 'network-only' } }),
+  graphql(createMessageMutation),
+)(CommunicatorHome);

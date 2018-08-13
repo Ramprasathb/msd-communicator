@@ -54,11 +54,13 @@ const constructChannelView = ({ id, name }, teamId) => (
   </Link>
 );
 
-const constructDirectMessagesView = dmUserObject => (
-  <ChannelSectionListItem key={`dm_${dmUserObject.id}`}>
-    <Bubble />
-    {dmUserObject.name}
-  </ChannelSectionListItem>
+const constructDirectMessagesView = ({ id, username }, teamId) => (
+  <Link to={`/user/${teamId}/${id}`} key={`dm_${id}`}>
+    <ChannelSectionListItem>
+      <Bubble />
+      {username}
+    </ChannelSectionListItem>
+  </Link>
 );
 
 const Channels = ({
@@ -70,6 +72,7 @@ const Channels = ({
   users,
   createChannelCallback,
   onInviteUsersClick,
+  onDMUsersCallback,
 }) => (
   <ChannelComponent>
     <PullLeft>
@@ -97,8 +100,13 @@ const Channels = ({
     </div>
     <div>
       <ChannelSectionList>
-        <ChannelSectionListHeader> Direct Messages</ChannelSectionListHeader>
-        {users.map(constructDirectMessagesView)}
+        <ChannelSectionListHeader>
+          Direct Messages&nbsp;
+          <Icon name="add circle" onClick={onDMUsersCallback} />
+        </ChannelSectionListHeader>
+        {users.map(u => (
+          (u.username !== userName)
+            ? constructDirectMessagesView(u, teamId, userName) : null))}
       </ChannelSectionList>
     </div>
   </ChannelComponent>

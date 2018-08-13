@@ -9,6 +9,10 @@ export const getAllTeamsQuery = gql`
         id
         name
       }
+      directMessageMembers {
+        id
+        username
+      }
     }
     memberOfTeams {
       id
@@ -16,6 +20,10 @@ export const getAllTeamsQuery = gql`
       channels {
         id
         name
+      }
+      directMessageMembers {
+        id
+        username
       }
     }
   }

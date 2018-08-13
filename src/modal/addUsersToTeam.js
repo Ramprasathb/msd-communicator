@@ -21,6 +21,11 @@ class AddUsersToTeamModal extends React.Component {
     this.setState({ [name]: value });
   };
 
+  close = () => {
+    this.setState({ errorMessages: [] });
+    this.props.onClose();
+  };
+
   addUserToTeam = async () => {
     const { email } = this.state;
     const { teamId } = this.props;
@@ -45,6 +50,7 @@ class AddUsersToTeamModal extends React.Component {
       const { success, errors } = response.data.addUserToTeam;
       if (success) {
         this.props.onClose();
+        this.setState({ errorMessages: [] });
       } else {
         const errorMessages = [];
         errors.forEach(({ field, message }) => {
@@ -57,9 +63,9 @@ class AddUsersToTeamModal extends React.Component {
 
   render() {
     const { loading, errorMessages } = this.state;
-    const { open, onClose } = this.props;
+    const { open } = this.props;
     return (
-      <Modal open={open} onClose={onClose}>
+      <Modal open={open} onClose={this.close}>
         <Modal.Header>Add User to this Team</Modal.Header>
         <Modal.Content>
           <Segment vertical loading={loading}>
@@ -90,7 +96,7 @@ class AddUsersToTeamModal extends React.Component {
           <Button onClick={this.addUserToTeam} basic color="green">
             Add Users
           </Button>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={this.close}>Cancel</Button>
         </Modal.Actions>
       </Modal>
     );

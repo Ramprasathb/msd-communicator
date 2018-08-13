@@ -11,66 +11,65 @@ const newChannelMessageSubscription = gql`
     newChannelMessage(channelId: $channelId) {
       id
       text
-      user {
-        id
-        email
-        username
-      }
       created_at
     }
   }
 `;
 
 class MessageViewContainer extends React.Component {
-  componentWillMount() {
-    this.unsubscribe = this.subscribe(this.props.channelId);
-  }
+  // componentWillMount() {
+  // this.unsubscribe = this.subscribe(this.props.channelId);
+  // }
 
-  componentWillReceiveProps({ channelId }) {
-    if (this.props.channelId !== channelId) {
-      if (this.unsubscribe) {
-        this.unsubscribe();
-      }
-      this.unsubscribe = this.subscribe(channelId);
-    }
-  }
+  // componentWillReceiveProps({ channelId }) {
+  //   if (this.props.channelId !== channelId) {
+  //     if (this.unsubscribe) {
+  //       this.unsubscribe();
+  //     }
+  //     this.unsubscribe = this.subscribe(channelId);
+  //   }
+  // }
 
-  componentWillUnmount() {
-    if (this.unsubscribe) {
-      this.unsubscribe();
-    }
-  }
+  // componentWillUnmount() {
+  //   if (this.unsubscribe) {
+  //     this.unsubscribe();
+  //   }
+  // }
 
-  subscribe = channelId => (
-    this.props.data.subscribeToMore({
-      document: newChannelMessageSubscription,
-      variables: {
-        channelId,
-      },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData) {
-          return prev;
-        }
+  subscribe = () => {
+    // this.props.data.subscribeToMore({
+    //   document: newChannelMessageSubscription,
+    //   variables: {
+    //     channelId,
+    //   },
+    //   updateQuery: (prev, { subscriptionData }) => {
+    //     if (!subscriptionData) {
+    //       return prev;
+    //     }
 
-        return {
-          ...prev,
-          messages: [...prev.messages, subscriptionData.newChannelMessage],
-        };
-      },
-    })
-  );
+    //     return {
+    //       ...prev,
+    //       messages: [...prev.messages, subscriptionData.newChannelMessage],
+    //     };
+    //   },
+    //   onError: err => console.log(err),
+    // })
+    console.log('subscribe');
+    return false;
+  };
 
   render() {
     const {
       data: { loading, getMessages },
     } = this.props;
+    console.log(this.props.data);
     return loading ? null : (
       <Messages>
         <Comment.Group>
           {getMessages.map(m => (
             <Comment key={`${m.id}-message`}>
               <Comment.Content>
-                <Comment.Author as="a">{m.member.username}</Comment.Author>
+                <Comment.Author as="a">{m.user.username}</Comment.Author>
                 <Comment.Metadata>
                   <Moment fromNow>{m.created_at}</Moment>
                 </Comment.Metadata>
@@ -92,7 +91,7 @@ const getMessagesQuery = gql`
     getMessages(channelId: $channelId) {
       id
       message
-      member {
+      user {
         id
         username
         email
@@ -106,7 +105,4 @@ export default graphql(getMessagesQuery, {
   variables: props => ({
     channelId: props.channelId,
   }),
-  options: {
-    fetchPolicy: 'network-only',
-  },
 })(MessageViewContainer);
