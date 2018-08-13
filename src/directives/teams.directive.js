@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Link, Redirect } from 'react-router-dom';
-import { Button } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
+import { Icon } from 'semantic-ui-react';
 
 // Start of Team Component
 const TeamComponent = styled.div`
@@ -57,9 +57,9 @@ const Teams = ({ teams }) => (
       </TeamList>
       <TeamList>
         <Link to="/login">
-          <Button size="mini" style={{ alignItem: 'center' }}>
-            Logout
-          </Button>
+          <TeamListItem title="Log out">
+            <Icon name="log out" />
+          </TeamListItem>
         </Link>
       </TeamList>
     </div>

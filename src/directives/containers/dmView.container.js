@@ -73,9 +73,9 @@ class DirectMessageContainer extends React.Component {
                   <div>{m.created_at}</div>
                 </Comment.Metadata>
                 <Comment.Text>{m.message}</Comment.Text>
-                {/* <Comment.Actions>
+                <Comment.Actions>
                   <Comment.Action>Reply</Comment.Action>
-                </Comment.Actions> */}
+                </Comment.Actions>
               </Comment.Content>
             </Comment>
           ))}

@@ -74,9 +74,9 @@ class MessageViewContainer extends React.Component {
                   <Moment fromNow>{m.created_at}</Moment>
                 </Comment.Metadata>
                 <Comment.Text>{m.message}</Comment.Text>
-                {/* <Comment.Actions>
+                <Comment.Actions>
                   <Comment.Action>Reply</Comment.Action>
-                </Comment.Actions> */}
+                </Comment.Actions>
               </Comment.Content>
             </Comment>
           ))}
