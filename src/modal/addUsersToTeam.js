@@ -9,55 +9,27 @@ import {
 } from 'semantic-ui-react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
-import findIndex from 'lodash/findIndex';
 
-import { getAllTeamsQuery } from '../query/team.query';
-
-class CreateChannelModal extends React.Component {
+class AddUsersToTeamModal extends React.Component {
   state = {
     loading: false,
     errorMessages: [],
   };
-
-  componentDidMount() {
-    this.setState({ errorMessages: [] });
-  }
 
   updateInputValues = (e) => {
     const { name, value } = e.target;
     this.setState({ [name]: value });
   };
 
-  createChannelForTeam = async () => {
-    const { name } = this.state;
+  addUserToTeam = async () => {
+    const { email } = this.state;
     const { teamId } = this.props;
-    if (name.length > 0) {
+    if (email.length > 0) {
       this.setState({ loading: true });
       let response = null;
       try {
         response = await this.props.mutate({
-          variables: { name, teamId },
-          update: (store, { data: { createChannel } }) => {
-            const { success, channel } = createChannel;
-            if (!success) {
-              return;
-            }
-            const data = store.readQuery({ query: getAllTeamsQuery });
-            if (data.ownedTeams) {
-              const currentTeamIndex = findIndex(data.ownedTeams, [
-                'id',
-                teamId,
-              ]);
-              data.ownedTeams[currentTeamIndex].channels.push(channel);
-            } else {
-              const currentTeamIndex = findIndex(data.memberOfTeams, [
-                'id',
-                teamId,
-              ]);
-              data.memberOfTeams[currentTeamIndex].channels.push(channel);
-            }
-            store.writeQuery({ query: getAllTeamsQuery, data });
-          },
+          variables: { email, teamId },
         });
         this.setState({ loading: false });
       } catch (err) {
@@ -70,9 +42,8 @@ class CreateChannelModal extends React.Component {
         return;
       }
 
-      const { success, errors } = response.data.createChannel;
+      const { success, errors } = response.data.addUserToTeam;
       if (success) {
-        this.setState({ errorMessages: [] });
         this.props.onClose();
       } else {
         const errorMessages = [];
@@ -89,17 +60,17 @@ class CreateChannelModal extends React.Component {
     const { open, onClose } = this.props;
     return (
       <Modal open={open} onClose={onClose}>
-        <Modal.Header>Create a channel for this team</Modal.Header>
+        <Modal.Header>Add User to this Team</Modal.Header>
         <Modal.Content>
           <Segment vertical loading={loading}>
             <Form>
               <Form.Field>
                 <Input
                   onChange={this.updateInputValues}
-                  name="name"
+                  name="email"
                   fluid
                   icon="add"
-                  placeholder="Channel name"
+                  placeholder="User e-mail address"
                 />
               </Form.Field>
             </Form>
@@ -108,7 +79,7 @@ class CreateChannelModal extends React.Component {
           {errorMessages.length > 0 ? (
             <Message
               error
-              header="Error while creating channels"
+              header="Error while adding user"
               list={errorMessages}
             />
           ) : (
@@ -116,8 +87,8 @@ class CreateChannelModal extends React.Component {
           )}
         </Modal.Content>
         <Modal.Actions>
-          <Button onClick={this.createChannelForTeam} basic color="green">
-            Create Channel
+          <Button onClick={this.addUserToTeam} basic color="green">
+            Add Users
           </Button>
           <Button onClick={onClose}>Cancel</Button>
         </Modal.Actions>
@@ -126,14 +97,10 @@ class CreateChannelModal extends React.Component {
   }
 }
 
-const createChannelForTeamMutation = gql`
-  mutation($name: String!, $teamId: Int!) {
-    createChannel(name: $name, teamId: $teamId) {
+const addUserToTeamMutation = gql`
+  mutation($email: String!, $teamId: Int!) {
+    addUserToTeam(email: $email, teamId: $teamId) {
       success
-      channel {
-        id
-        name
-      }
       errors {
         field
         message
@@ -142,4 +109,4 @@ const createChannelForTeamMutation = gql`
   }
 `;
 
-export default graphql(createChannelForTeamMutation)(CreateChannelModal);
+export default graphql(addUserToTeamMutation)(AddUsersToTeamModal);

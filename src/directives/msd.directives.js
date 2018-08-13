@@ -26,8 +26,12 @@ const ChannelHeader = ({ channelName }) => (
 );
 
 const Messages = styled.div`
+  padding: 10px;
   grid-column: 3;
   grid-row: 2;
+  display: flex;
+  flex-direction: column-reverse;
+  overflow-y: auto;
 `;
 
 const MessageInputComponent = styled.div`

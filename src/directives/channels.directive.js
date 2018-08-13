@@ -9,6 +9,7 @@ const ChannelComponent = styled.div`
   grid-row: 1 / 4;
   background-color: #4e3a4c;
   color: #958993;
+  overflow-y: auto;
 `;
 
 const ChannelSectionHeader = styled.div`
@@ -63,22 +64,33 @@ const constructDirectMessagesView = dmUserObject => (
 const Channels = ({
   teamId,
   teamName,
+  isOwnedTeam,
   userName,
   channels,
   users,
   createChannelCallback,
+  onInviteUsersClick,
 }) => (
   <ChannelComponent>
     <PullLeft>
       <ChannelSectionHeader>{teamName}</ChannelSectionHeader>
       &nbsp;(
       {userName})
+      {isOwnedTeam ? (
+        <div>
+          <a href="#inviteUsers" onClick={onInviteUsersClick}>
+            Invite users
+          </a>
+        </div>
+      ) : null}
     </PullLeft>
     <div>
       <ChannelSectionList>
         <ChannelSectionListHeader>
           Channels&nbsp;
-          <Icon name="add circle" onClick={createChannelCallback} />
+          {isOwnedTeam ? (
+            <Icon name="add circle" onClick={createChannelCallback} />
+          ) : null}
         </ChannelSectionListHeader>
         {channels.map(c => constructChannelView(c, teamId))}
       </ChannelSectionList>

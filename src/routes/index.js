@@ -9,7 +9,7 @@ import Landing from './landing';
 import RegisterUser from './registerUser';
 import Login from './login';
 import CreateTeam from './createTeam';
-import AllTeams from './allTeams';
+import AllTeams from './communicatorHome';
 
 const isUserAuthenticated = () => {
   const token = localStorage.getItem('token');
