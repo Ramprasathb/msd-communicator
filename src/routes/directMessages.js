@@ -56,12 +56,12 @@ const DirectMessages = ({
         teams={allTeams}
         currentTeam={currentTeamObj}
       />
-      <ChannelHeader channelName="Dummy Text" />
+      <ChannelHeader channelName={getUser.username} />
       <DmViewContainer teamId={teamId} userId={userId} />
       <MessageInput
         onSubmit={
           async (message) => {
-            const response = await mutate(
+            await mutate(
               {
                 variables: {
                   message,

@@ -6,57 +6,57 @@ import Moment from 'react-moment';
 
 import { Messages } from '../msd.directives';
 
-// const newChannelMessageSubscription = gql`
-//   subscription($channelId: Int!) {
-//     newChannelMessage(channelId: $channelId) {
-//       id
-//       text
-//       user {
-//         username
-//       }
-//       created_at
-//     }
-//   }
-// `;
+const newChannelMessageSubscription = gql`
+  subscription($channelId: Int!) {
+    newChannelMessage(channelId: $channelId) {
+      id
+      message
+      user {
+        username
+      }
+      created_at
+    }
+  }
+`;
 
 // eslint-disable-next-line react/prefer-stateless-function
 class DirectMessageContainer extends React.Component {
-  // componentWillMount() {
-  //   this.unsubscribe = this.subscribe(this.props.channelId);
-  // }
+  componentWillMount() {
+    this.unsubscribe = this.subscribe(this.props.userId);
+  }
 
-  // componentWillReceiveProps({ channelId }) {
-  //   if (this.props.channelId !== channelId) {
-  //     if (this.unsubscribe) {
-  //       this.unsubscribe();
-  //     }
-  //     this.unsubscribe = this.subscribe(channelId);
-  //   }
-  // }
+  componentWillReceiveProps({ channelId }) {
+    if (this.props.channelId !== channelId) {
+      if (this.unsubscribe) {
+        this.unsubscribe();
+      }
+      this.unsubscribe = this.subscribe(channelId);
+    }
+  }
 
-  // componentWillUnmount() {
-  //   if (this.unsubscribe) {
-  //     this.unsubscribe();
-  //   }
-  // }
+  componentWillUnmount() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+  }
 
-  // subscribe = channelId =>
-  //   this.props.data.subscribeToMore({
-  //     document: newChannelMessageSubscription,
-  //     variables: {
-  //       channelId,
-  //     },
-  //     updateQuery: (prev, { subscriptionData }) => {
-  //       if (!subscriptionData) {
-  //         return prev;
-  //       }
-
-  //       return {
-  //         ...prev,
-  //         messages: [...prev.messages, subscriptionData.newChannelMessage],
-  //       };
-  //     },
-  //   });
+  subscribe = (channelId) => {
+    this.props.data.subscribeToMore({
+      document: newChannelMessageSubscription,
+      variables: {
+        channelId,
+      },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData) {
+          return prev;
+        }
+        return {
+          ...prev,
+          messages: [...prev.messages, subscriptionData.newChannelMessage],
+        };
+      },
+    });
+  };
 
   render() {
     const {
@@ -74,6 +74,23 @@ class DirectMessageContainer extends React.Component {
                   <Moment fromNow>{m.created_at}</Moment>
                 </Comment.Metadata>
                 <Comment.Text>{m.message}</Comment.Text>
+                {m.reply.length === 0 ? null : (
+                  <Comment.Group>
+                    {m.reply.map(r => (
+                      <Comment key={`${r.id}-direct-message-reply`}>
+                        <Comment.Content>
+                          <Comment.Author as="a">
+                            {r.sender.username}
+                          </Comment.Author>
+                          <Comment.Metadata>
+                            <Moment fromNow>{r.created_at}</Moment>
+                          </Comment.Metadata>
+                          <Comment.Text>{r.message}</Comment.Text>
+                        </Comment.Content>
+                      </Comment>
+                    ))}
+                  </Comment.Group>
+                )}
                 <Comment.Actions>
                   <Comment.Action>Reply</Comment.Action>
                 </Comment.Actions>
@@ -95,6 +112,14 @@ const directMessagesQuery = gql`
       }
       message
       created_at
+      reply {
+        id
+        sender {
+          username
+        }
+        message
+        created_at
+      }
     }
   }
 `;

@@ -62,7 +62,6 @@ class MessageViewContainer extends React.Component {
     const {
       data: { loading, getMessages },
     } = this.props;
-    console.log(this.props.data);
     return loading ? null : (
       <Messages>
         <Comment.Group>
@@ -74,6 +73,23 @@ class MessageViewContainer extends React.Component {
                   <Moment fromNow>{m.created_at}</Moment>
                 </Comment.Metadata>
                 <Comment.Text>{m.message}</Comment.Text>
+                {m.reply.length === 0 ? null : (
+                  <Comment.Group>
+                    {m.reply.map(r => (
+                      <Comment key={`${r.id}-channel-message-reply`}>
+                        <Comment.Content>
+                          <Comment.Author as="a">
+                            {r.sender.username}
+                          </Comment.Author>
+                          <Comment.Metadata>
+                            <Moment fromNow>{r.created_at}</Moment>
+                          </Comment.Metadata>
+                          <Comment.Text>{r.message}</Comment.Text>
+                        </Comment.Content>
+                      </Comment>
+                    ))}
+                  </Comment.Group>
+                )}
                 <Comment.Actions>
                   <Comment.Action>Reply</Comment.Action>
                 </Comment.Actions>
@@ -92,11 +108,17 @@ const getMessagesQuery = gql`
       id
       message
       user {
-        id
         username
-        email
       }
       created_at
+      reply {
+        id
+        sender {
+          username
+        }
+        message
+        created_at
+      }
     }
   }
 `;
