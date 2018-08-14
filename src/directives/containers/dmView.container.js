@@ -6,15 +6,23 @@ import Moment from 'react-moment';
 
 import { Messages } from '../msd.directives';
 
-const newChannelMessageSubscription = gql`
-  subscription($channelId: Int!) {
-    newChannelMessage(channelId: $channelId) {
+const newDirectMessageSubscription = gql`
+  subscription($teamId: Int!, $userId: Int!) {
+    newDirectMessage(teamId: $teamId, userId: $userId) {
       id
       message
-      user {
+      sender {
         username
       }
       created_at
+      reply {
+        id
+        message
+        sender {
+          username
+        }
+        created_at
+      }
     }
   }
 `;
@@ -22,15 +30,15 @@ const newChannelMessageSubscription = gql`
 // eslint-disable-next-line react/prefer-stateless-function
 class DirectMessageContainer extends React.Component {
   componentWillMount() {
-    this.unsubscribe = this.subscribe(this.props.userId);
+    this.unsubscribe = this.subscribe(this.props.teamId, this.props.userId);
   }
 
-  componentWillReceiveProps({ channelId }) {
-    if (this.props.channelId !== channelId) {
+  componentWillReceiveProps({ teamId, userId }) {
+    if (this.props.teamId !== teamId || this.props.userId !== userId) {
       if (this.unsubscribe) {
         this.unsubscribe();
       }
-      this.unsubscribe = this.subscribe(channelId);
+      this.unsubscribe = this.subscribe(teamId, userId);
     }
   }
 
@@ -40,19 +48,24 @@ class DirectMessageContainer extends React.Component {
     }
   }
 
-  subscribe = (channelId) => {
+  subscribe = (teamId, userId) => {
     this.props.data.subscribeToMore({
-      document: newChannelMessageSubscription,
+      document: newDirectMessageSubscription,
       variables: {
-        channelId,
+        teamId,
+        userId,
       },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData) {
           return prev;
         }
+
         return {
           ...prev,
-          messages: [...prev.messages, subscriptionData.newChannelMessage],
+          getDirectMessages: [
+            ...prev.getDirectMessages,
+            subscriptionData.data.newDirectMessage,
+          ],
         };
       },
     });
@@ -125,8 +138,11 @@ const directMessagesQuery = gql`
 `;
 
 export default graphql(directMessagesQuery, {
-  variables: props => ({
-    teamId: props.teamId,
-    userId: props.userId,
+  options: props => ({
+    variables: {
+      teamId: props.teamId,
+      userId: props.userId,
+    },
+    fetchPolicy: 'network-only',
   }),
 })(DirectMessageContainer);

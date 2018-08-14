@@ -10,51 +10,63 @@ const newChannelMessageSubscription = gql`
   subscription($channelId: Int!) {
     newChannelMessage(channelId: $channelId) {
       id
-      text
+      message
+      user {
+        username
+      }
       created_at
+      reply {
+        id
+        message
+        sender {
+          username
+        }
+        created_at
+      }
     }
   }
 `;
 
 class MessageViewContainer extends React.Component {
-  // componentWillMount() {
-  // this.unsubscribe = this.subscribe(this.props.channelId);
-  // }
+  componentWillMount() {
+    this.unsubscribe = this.subscribe(this.props.channelId);
+  }
 
-  // componentWillReceiveProps({ channelId }) {
-  //   if (this.props.channelId !== channelId) {
-  //     if (this.unsubscribe) {
-  //       this.unsubscribe();
-  //     }
-  //     this.unsubscribe = this.subscribe(channelId);
-  //   }
-  // }
+  componentWillReceiveProps({ channelId }) {
+    if (this.props.channelId !== channelId) {
+      if (this.unsubscribe) {
+        this.unsubscribe();
+      }
+      this.unsubscribe = this.subscribe(channelId);
+    }
+  }
 
-  // componentWillUnmount() {
-  //   if (this.unsubscribe) {
-  //     this.unsubscribe();
-  //   }
-  // }
+  componentWillUnmount() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+  }
 
-  subscribe = () => {
-    // this.props.data.subscribeToMore({
-    //   document: newChannelMessageSubscription,
-    //   variables: {
-    //     channelId,
-    //   },
-    //   updateQuery: (prev, { subscriptionData }) => {
-    //     if (!subscriptionData) {
-    //       return prev;
-    //     }
-
-    //     return {
-    //       ...prev,
-    //       messages: [...prev.messages, subscriptionData.newChannelMessage],
-    //     };
-    //   },
-    //   onError: err => console.log(err),
-    // })
-    console.log('subscribe');
+  subscribe = (channelId) => {
+    this.props.data.subscribeToMore({
+      document: newChannelMessageSubscription,
+      variables: {
+        channelId,
+      },
+      updateQuery: (prev, { subscriptionData }) => {
+        console.log('got update');
+        if (!subscriptionData) {
+          return prev;
+        }
+        return {
+          ...prev,
+          getMessages: [
+            ...prev.getMessages,
+            subscriptionData.data.newChannelMessage,
+          ],
+        };
+      },
+    });
     return false;
   };
 
