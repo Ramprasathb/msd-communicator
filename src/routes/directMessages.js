@@ -4,6 +4,7 @@ import { Redirect } from 'react-router-dom';
 import findIndex from 'lodash/findIndex';
 import cloneDeep from 'lodash/cloneDeep';
 import gql from 'graphql-tag';
+import decode from 'jwt-decode';
 
 import { MsdGridLayout, ChannelHeader } from '../directives/msd.directives';
 import MessageInput from '../directives/messageInput.directive';
@@ -20,6 +21,16 @@ const DirectMessages = ({
     params: { teamId, userId },
   },
 }) => {
+  let senderId = 0;
+  try {
+    const authToken = localStorage.getItem('token');
+    const { user } = decode(authToken);
+    // eslint-disable-next-line prefer-destructuring
+    senderId = user.id;
+  } catch (err) {
+    // Ignore the error and keep username as blank
+  }
+
   if (loading) return null;
   if (error) {
     return (
@@ -57,7 +68,7 @@ const DirectMessages = ({
         currentTeam={currentTeamObj}
       />
       <ChannelHeader channelName={getUser.username} />
-      <DmViewContainer teamId={teamId} userId={userId} />
+      <DmViewContainer teamId={teamId} userId={userId} senderId={senderId} />
       <MessageInput
         onSubmit={
           async (message) => {

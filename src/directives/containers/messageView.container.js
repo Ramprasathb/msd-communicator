@@ -47,28 +47,26 @@ class MessageViewContainer extends React.Component {
     }
   }
 
-  subscribe = (channelId) => {
-    this.props.data.subscribeToMore({
-      document: newChannelMessageSubscription,
-      variables: {
-        channelId,
-      },
-      updateQuery: (prev, { subscriptionData }) => {
-        console.log('got update');
-        if (!subscriptionData) {
-          return prev;
-        }
-        return {
-          ...prev,
-          getMessages: [
-            ...prev.getMessages,
-            subscriptionData.data.newChannelMessage,
-          ],
-        };
-      },
-    });
-    return false;
-  };
+  subscribe = channelId => (this.props.data.subscribeToMore({
+    document: newChannelMessageSubscription,
+    variables: {
+      channelId,
+    },
+    updateQuery: (prev, { subscriptionData }) => {
+      console.log('got update');
+      if (!subscriptionData) {
+        return prev;
+      }
+      return {
+        ...prev,
+        getMessages: [
+          ...prev.getMessages,
+          subscriptionData.data.newChannelMessage,
+        ],
+      };
+    },
+  }));
+
 
   render() {
     const {
